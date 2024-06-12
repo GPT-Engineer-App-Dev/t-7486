@@ -1,17 +1,84 @@
-// Update this page (the content is just a fallback if you fail and example)
-// Use chakra-ui
-import { Container, Text, VStack } from "@chakra-ui/react";
-
-// Example of using react-icons
-// import { FaRocket } from "react-icons/fa";
-// <IconButton aria-label="Add" icon={<FaRocket />} size="lg" />; // IconButton would also have to be imported from chakra
+import React, { useState } from 'react';
+import { Container, VStack, HStack, Input, Button, Text, IconButton } from '@chakra-ui/react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const Index = () => {
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState('');
+  const [editIndex, setEditIndex] = useState(null);
+  const [editTask, setEditTask] = useState('');
+
+  const addTask = () => {
+    if (newTask.trim() !== '') {
+      setTasks([...tasks, newTask]);
+      setNewTask('');
+    }
+  };
+
+  const deleteTask = (index) => {
+    const updatedTasks = tasks.filter((_, i) => i !== index);
+    setTasks(updatedTasks);
+  };
+
+  const startEditTask = (index) => {
+    setEditIndex(index);
+    setEditTask(tasks[index]);
+  };
+
+  const saveEditTask = (index) => {
+    const updatedTasks = tasks.map((task, i) => (i === index ? editTask : task));
+    setTasks(updatedTasks);
+    setEditIndex(null);
+    setEditTask('');
+  };
+
   return (
-    <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <VStack spacing={4}>
-        <Text fontSize="2xl">Your Blank Canvas</Text>
-        <Text>Chat with the agent to start making edits.</Text>
+    <Container centerContent maxW="container.md" py={10}>
+      <VStack spacing={4} w="100%">
+        <HStack w="100%">
+          <Input 
+            placeholder="Add a new task" 
+            value={newTask} 
+            onChange={(e) => setNewTask(e.target.value)} 
+          />
+          <Button onClick={addTask} colorScheme="teal">Add Task</Button>
+        </HStack>
+        <VStack w="100%" spacing={2}>
+          {tasks.map((task, index) => (
+            <HStack key={index} w="100%" justifyContent="space-between">
+              {editIndex === index ? (
+                <Input 
+                  value={editTask} 
+                  onChange={(e) => setEditTask(e.target.value)} 
+                />
+              ) : (
+                <Text>{task}</Text>
+              )}
+              <HStack spacing={1}>
+                {editIndex === index ? (
+                  <IconButton 
+                    aria-label="Save" 
+                    icon={<FaEdit />} 
+                    onClick={() => saveEditTask(index)} 
+                    colorScheme="teal"
+                  />
+                ) : (
+                  <IconButton 
+                    aria-label="Edit" 
+                    icon={<FaEdit />} 
+                    onClick={() => startEditTask(index)} 
+                  />
+                )}
+                <IconButton 
+                  aria-label="Delete" 
+                  icon={<FaTrash />} 
+                  onClick={() => deleteTask(index)} 
+                  colorScheme="red"
+                />
+              </HStack>
+            </HStack>
+          ))}
+        </VStack>
       </VStack>
     </Container>
   );
